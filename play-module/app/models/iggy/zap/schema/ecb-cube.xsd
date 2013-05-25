@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           targetNamespace="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="Cube" type="eur:CubeType" xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"/>
+
+    <xs:complexType name="CubeType">
+        <xs:sequence>
+            <xs:element type="eur:TimeCube" name="Cube" maxOccurs="unbounded" minOccurs="0"
+                        xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TimeCube" xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref">
+        <xs:sequence>
+            <xs:element type="eur:CurrencyCube" name="Cube" maxOccurs="unbounded" minOccurs="0"
+                        xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"/>
+        </xs:sequence>
+        <xs:attribute type="xs:date" name="time" />
+    </xs:complexType>
+
+    <xs:complexType name="CurrencyCube" xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref">
+        <xs:attribute type="xs:string" name="currency"  />
+        <xs:attribute type="xs:float" name="rate"/>
+    </xs:complexType>
+
+
+</xs:schema>

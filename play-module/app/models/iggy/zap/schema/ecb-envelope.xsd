@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           targetNamespace="http://www.gesmes.org/xml/2002-08-01" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:import schemaLocation="ecb-cube.xsd" namespace="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"/>
+
+    <xs:element name="Envelope" type="ns:EnvelopeType" xmlns:ns="http://www.gesmes.org/xml/2002-08-01"/>
+    <xs:complexType name="SenderType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="EnvelopeType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="subject"/>
+            <xs:element type="ns:SenderType" name="Sender" xmlns:ns="http://www.gesmes.org/xml/2002-08-01"/>
+            <xs:element ref="eur:Cube" xmlns:eur="http://www.ecb.int/vocabulary/2002-08-01/eurofxref"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
