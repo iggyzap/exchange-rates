@@ -37,9 +37,11 @@ var parseDate = d3.time.format("%d-%m-%Y").parse;
 var x = d3.time.scale()
     .range([0, width]);
 
-var formatNumber = d3.format(",.4g"); // for formatting integers
+var formatNumber = d3.format(".4g"); // for formatting integers
 
-var y = d3.scale.log().base(2)
+var y = d3.scale.log()
+    .base(1.2)
+    .nice()
     .range([height, 0]);
 //y.tickFormat (100, formatNumber);
 
@@ -50,6 +52,7 @@ var xAxis = d3.svg.axis()
     .orient("bottom");
 
 var yAxis = d3.svg.axis()
+    .tickFormat(formatNumber)
     .scale(y)
     .orient("left");
 
