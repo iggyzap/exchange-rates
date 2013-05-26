@@ -6,6 +6,7 @@ import models.iggy.zap.fx.CubeType;
 import models.iggy.zap.fx.CurrencyCube;
 import models.iggy.zap.fx.EnvelopeType;
 import models.iggy.zap.fx.TimeCube;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.MutableDateTime;
 import org.joda.time.ReadWritableDateTime;
 import play.data.binding.As;
@@ -16,30 +17,40 @@ import play.mvc.Controller;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+
+import static models.iggy.zap.CurrencyTripletPopulationJob.getAvailableCurrencies;
+import static models.iggy.zap.CurrencyTripletPopulationJob.getAvailableDates;
+import static models.iggy.zap.CurrencyTripletPopulationJob.getPromisedTriplets;
 
 public class FxController extends Controller {
 
-    private static ConcurrentMap<String, F.Promise<CurrencyTriplet>> promisedTriplets = new ConcurrentHashMap<String, F.Promise<CurrencyTriplet>>();
+    public static void listDates () {
+        List<Date> allDates = new ArrayList<Date>(getAvailableDates().keySet());
+        Collections.sort (allDates);
+        renderText(allDates);
+    }
+
+    public static void listCurrencies () {
+        renderText(getAvailableCurrencies().keySet());
+    }
 
     /**
      * Supports pseudo-real-time querying for a X days for currency - NB - this will block indefinitely if days will
      * never be fetched. If Play promise holds - final await will allow other requests to succeed!
+     *
      * @param from
      * @param days
      * @param currency
      */
-    public static void refresh(@As("dd-MM-yyyy")Date from, int days, String currency) {
+    public static void currencyHistory(@As("dd-MM-yyyy") Date from, int days, String currency) {
         final Set<String> names = Collections.singleton(currency);
         final List<F.Promise<CurrencyTriplet>> toWait = new ArrayList<F.Promise<CurrencyTriplet>>(days);
-        for (int i =0 ; i< days; i++) {
+        for (int i = 0; i < days; i++) {
             //this will use ide that we either already have those triplets, or they will be populated in a future
-            toWait.add(promisedTriplets.putIfAbsent(CurrencyTriplet.mapKey(add(from, days), currency),
+            toWait.add(getPromisedTriplets().putIfAbsent(CurrencyTriplet.mapKey(add(from, days), currency),
                     new F.Promise<CurrencyTriplet>()));
         }
 
@@ -49,7 +60,7 @@ public class FxController extends Controller {
                 SortedMap<Date, Map<String, Float>> groupedFx = new TreeMap<Date, Map<String, Float>>();
 
                 for (F.Promise<CurrencyTriplet> promisedTriplet : toWait) {
-                    easyAdd(groupedFx, promisedTriplet.get());
+                    addToMap(groupedFx, promisedTriplet.get());
                 }
 
                 return new CsvTabulator(names, groupedFx);
@@ -59,7 +70,7 @@ public class FxController extends Controller {
         renderText(await(promise));
     }
 
-    private static void easyAdd(SortedMap<Date, Map<String, Float>> groupedFx, CurrencyTriplet currencyTriplet) {
+    private static void addToMap(SortedMap<Date, Map<String, Float>> groupedFx, CurrencyTriplet currencyTriplet) {
         Map<String, Float> map = groupedFx.get(currencyTriplet.date);
         if (map == null) {
             map = new HashMap<String, Float>();
@@ -99,13 +110,7 @@ public class FxController extends Controller {
                     EnvelopeType envelope = JAXBContext.newInstance(EnvelopeType.class).createUnmarshaller().unmarshal(new StreamSource(is), EnvelopeType.class).getValue();
                     return envelope.getCube();
                 } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            //ignore
-                        }
-                    }
+                    IOUtils.closeQuietly(is);
                 }
             }
         }.now();

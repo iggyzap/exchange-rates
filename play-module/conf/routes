@@ -6,6 +6,9 @@
 GET     /                                       Application.index
 
 GET     /fx                                     iggy.zap.fx.rates.FxController.filterCurrencies
+GET     /currencies                             iggy.zap.fx.rates.FxController.listCurrencies
+GET     /dates                                  iggy.zap.fx.rates.FxController.listDates
+GET     /historical                             iggy.zap.fx.rates.FxController.currencyHistory
 
 
 # Ignore favicon requests
