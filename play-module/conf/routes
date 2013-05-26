@@ -5,6 +5,9 @@
 # Home page
 GET     /                                       Application.index
 
+GET     /fx                                     iggy.zap.fx.rates.FxController.filterCurrencies
+
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 
