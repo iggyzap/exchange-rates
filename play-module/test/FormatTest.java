@@ -14,7 +14,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
-public class TransformTest {
+public class FormatTest {
 
     private String sampleName = "sample.xml";
 
@@ -26,7 +26,7 @@ public class TransformTest {
     }
 
     @Test
-    public void testTransfomerLoads() throws Exception {
+    public void testJaxbFindsClasses() throws Exception {
         assertNotNull (context);
     }
 

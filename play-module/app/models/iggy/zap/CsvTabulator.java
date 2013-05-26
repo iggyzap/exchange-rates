@@ -17,6 +17,9 @@ public class CsvTabulator {
     }
 
     @Override
+    /**
+     * Provides csv-like notation for String representation.
+     */
     public String toString() {
 
         //todo move this into view... or not ?
