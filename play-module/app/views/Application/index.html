@@ -37,8 +37,11 @@ var parseDate = d3.time.format("%d-%m-%Y").parse;
 var x = d3.time.scale()
     .range([0, width]);
 
-var y = d3.scale.linear()
+var formatNumber = d3.format(",.4g"); // for formatting integers
+
+var y = d3.scale.log().base(2)
     .range([height, 0]);
+//y.tickFormat (100, formatNumber);
 
 var color = d3.scale.category10();
 
@@ -97,7 +100,7 @@ d3.csv("http://localhost:8080/fx", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Temperature (ºF)");
+      .text("FX rate to EUR");
 
   var city = svg.selectAll(".city")
       .data(cities)
