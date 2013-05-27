@@ -10,4 +10,8 @@ public class Application extends Controller {
         render();
     }
 
+    public static void index90() {
+        render("Application/all-90.html");
+    }
+
 }

@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                                       Application.index
+GET     /all-90.html                            Application.index90
 
 GET     /fx                                     iggy.zap.fx.rates.FxController.filterCurrencies
 GET     /currencies                             iggy.zap.fx.rates.FxController.listCurrencies

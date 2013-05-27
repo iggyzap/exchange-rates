@@ -48,13 +48,21 @@ public class FxController extends Controller {
      */
     public static void currencyHistory(@As("dd-MM-yyyy") Date from, int days, String currency) {
         final Set<String> names = Collections.singleton(currency);
+
+        if (from.after(new Date())) {
+            from = new Date();
+        }
+
+        if (days < 0) {
+            from = add(from, days);
+            days *= -1;
+        }
+//        Logger.info("Date : %1$s", from);
         final List<F.Promise<CurrencyTriplet>> toWait = new ArrayList<F.Promise<CurrencyTriplet>>(days);
         for (int i = 0; i < days; i++) {
             //this will use ide that we either already have those triplets, or they will be populated in a future
-            //unfortunately, logic below won't work, since we'll have gaps in data, and promisedTriplet on gap will fail
-            //with npe - has to be handled in triplet population job when we have gap to populate gaps
             String key = CurrencyTriplet.mapKey(add(from, i), currency);
-            Logger.info("Adding key %1$s", key);
+//            Logger.info("Adding key %1$s", key);
             toWait.add(getPromisedTriplets().putIfAbsent(key, new F.Promise<CurrencyTriplet>()));
         }
 
@@ -62,7 +70,7 @@ public class FxController extends Controller {
             @Override
             public CsvTabulator doJobWithResult() throws Exception {
                 SortedMap<Date, Map<String, Float>> groupedFx = new TreeMap<Date, Map<String, Float>>();
-                Logger.info("Expected values: %1$s", toWait.size());
+//                Logger.info("Expected values: %1$s", toWait.size());
                 for (F.Promise<CurrencyTriplet> promisedTriplet : toWait) {
                     addToMap(groupedFx, promisedTriplet.get());
                 }
@@ -76,7 +84,7 @@ public class FxController extends Controller {
 
     private static void addToMap(SortedMap<Date, Map<String, Float>> groupedFx, CurrencyTriplet currencyTriplet) {
         Map<String, Float> map = groupedFx.get(currencyTriplet.date);
-        Logger.info("Triplet %1$s %2$s %3$s", currencyTriplet.date, currencyTriplet.currency, currencyTriplet.rate);
+//        Logger.info("Triplet %1$s %2$s %3$s", currencyTriplet.date, currencyTriplet.currency, currencyTriplet.rate);
         if (map == null) {
             map = new HashMap<String, Float>();
             groupedFx.put(currencyTriplet.date, map);

@@ -49,10 +49,8 @@ public class CurrencyTripletPopulationJob extends Job {
 
             MutableDateTime mdt = new MutableDateTime(oldDate.getTime());
 
-            //still does not work. and won't work if historical data returned unsorted. We need to define clear
-            // completion criteria :/
-            for (mdt.addDays(1); mdt.toDate().before(currencyTriplet.date); mdt.addDays(1)) {
-                Logger.info("Adding gap date %1$s %2$s", mdt.toDate(), currencyTriplet.currency);
+            for (mdt.addDays(-1); mdt.toDate().after(currencyTriplet.date); mdt.addDays(-1)) {
+                Logger.debug("Adding gap date %1$s %2$s", mdt.toDate(), currencyTriplet.currency);
                 addInternal(new CurrencyTriplet(mdt.toDate(), currencyTriplet.currency, Float.NaN));
             }
         }
@@ -77,7 +75,9 @@ public class CurrencyTripletPopulationJob extends Job {
         try {
             EnvelopeType envelope = JAXBContext.newInstance(EnvelopeType.class).createUnmarshaller().unmarshal(new StreamSource(is), EnvelopeType.class).getValue();
             CubeType ct = envelope.getCube();
-            Date oldDate = null;
+            MutableDateTime dateTime = new MutableDateTime(new Date());
+            dateTime.addDays(1); //set it to tomorrow to guarantee that even if today's exchange rate is not available it will be covered
+            Date oldDate = dateTime.toDate();
             for (TimeCube tc : ct.getCube()) {
                 Date date = tc.getTime().toGregorianCalendar().getTime();
                 for (CurrencyCube cc : tc.getCube()) {

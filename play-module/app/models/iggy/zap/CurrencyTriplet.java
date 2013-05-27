@@ -17,6 +17,6 @@ public class CurrencyTriplet {
     }
 
     public static String mapKey(Date date, String currencyName) {
-        return String.format("%1$s_%2$s", date, currencyName);
+        return String.format("%1$tD_%2$s", date, currencyName);
     }
 }

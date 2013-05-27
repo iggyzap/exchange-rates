@@ -25,7 +25,7 @@ body {
 
 </style>
 <head>
-    <title>Exchange rate USD to EUR last 90 days.</title>
+    <title>Exchange rates to EUR, as provided by ECB.</title>
 </head>
 <body>
 <script src="http://d3js.org/d3.v3.js"></script>
@@ -42,7 +42,9 @@ var x = d3.time.scale()
 
 var formatNumber = d3.format(".4g"); // for formatting integers
 
-var y = d3.scale.linear()
+var y = d3.scale.log()
+    .base(1.2)
+    .nice()
     .range([height, 0]);
 //y.tickFormat (100, formatNumber);
 
@@ -68,7 +70,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("/historical?from=27-05-2013&days=-90&currency=USD", function(error, data) {
+d3.csv("/fx", function(error, data) {
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Date"; }));
 
   data.forEach(function(d) {
@@ -125,5 +127,3 @@ d3.csv("/historical?from=27-05-2013&days=-90&currency=USD", function(error, data
 });
 
 </script>
-
-<a href="all-90.html">Alternatively, all currencies for last 90 days from ECB</a>

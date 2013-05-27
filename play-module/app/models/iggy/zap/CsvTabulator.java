@@ -31,12 +31,23 @@ public class CsvTabulator {
         buff.append("\n");
         SimpleDateFormat sdf =new SimpleDateFormat("dd-MM-yyyy");
         for (Map.Entry<Date, Map<String, Float>> line : groupedFx.entrySet()) {
-            buff.append(sdf.format(line.getKey()));
+            boolean first=true;
+            boolean needNewLine = false;
             for (String currency: currencyNames) {
                 Float value = line.getValue().get(currency);
-                buff.append(",").append(value == null ? "" : value );
+                if (value == null || value.isNaN()) {
+                    continue;
+                }
+                if (first) {
+                    buff.append(sdf.format(line.getKey()));
+                    first = false;
+                    needNewLine = true;
+                }
+                buff.append(",").append(value);
             }
-            buff.append("\n");
+            if (needNewLine) {
+                buff.append("\n");
+            }
         }
 
         return buff.toString();
